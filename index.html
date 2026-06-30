@@ -47,43 +47,102 @@
     box-shadow:inset 0 0 220px rgba(0,0,0,0.7);
   }
 
-  /* ===== LOADER ===== */
-  #loader{
+  /* ===== LOADER (system boot style) ===== */
+  #loadingScreen{
     position:fixed; inset:0; z-index:999;
     background:var(--ink);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:26px;
-    transition:opacity 0.7s ease, visibility 0.7s ease;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
   }
-  #loader.hide{ opacity:0; visibility:hidden; }
-  .mono{
-    width:46px; height:46px;
-    border:1px solid rgba(255,255,255,0.12);
-    border-radius:50%;
+  #loadingScreen.fade-out{ animation:loadFadeOut 0.6s ease forwards; }
+  @keyframes loadFadeOut{ 0%{ opacity:1; transform:scale(1); } 100%{ opacity:0; transform:scale(1.03); pointer-events:none; } }
+  .loading-inner{
+    display:flex; flex-direction:column; align-items:center; gap:22px;
+    padding:0 32px; width:100%; max-width:380px;
+  }
+  .load-icon-ring{ position:relative; width:120px; height:120px; display:flex; align-items:center; justify-content:center; }
+  .load-ring-1{
+    position:absolute; width:120px; height:120px; border-radius:50%;
+    border:2px solid transparent; border-color:var(--violet) transparent var(--violet) transparent;
+    animation:spinIt 1.4s linear infinite;
+    box-shadow:0 0 20px rgba(168,60,255,0.4);
+  }
+  .load-ring-2{
+    position:absolute; width:96px; height:96px; border-radius:50%;
+    border:2px solid transparent; border-color:transparent var(--gold) transparent var(--gold);
+    animation:spinIt 2.1s linear infinite reverse;
+    box-shadow:0 0 14px rgba(240,198,116,0.35);
+  }
+  .load-ring-3{
+    position:absolute; width:74px; height:74px; border-radius:50%;
+    border:1.5px solid var(--line); border-top-color:var(--rose-soft);
+    animation:spinIt 3.2s linear infinite;
+  }
+  @keyframes spinIt{ to{ transform:rotate(360deg); } }
+  .load-avatar-icon{
+    width:52px; height:52px; border-radius:50%;
+    border:1px solid var(--line);
+    box-shadow:0 0 18px rgba(255,47,126,0.4);
     display:flex; align-items:center; justify-content:center;
+    animation:iconPulseL 2s ease-in-out infinite;
+    position:relative; z-index:1; overflow:hidden;
+  }
+  @keyframes iconPulseL{ 0%,100%{ box-shadow:0 0 18px rgba(255,47,126,0.4); } 50%{ box-shadow:0 0 6px rgba(168,60,255,0.2); } }
+  .loading-logo{
     font-family:'Cormorant Garamond', serif;
-    font-weight:600; font-size:18px;
-    color:var(--rose-soft);
-    position:relative;
+    font-size:clamp(1.1rem, 5.5vw, 1.65rem);
+    font-weight:700; font-style:italic; letter-spacing:0.05em;
+    color:var(--white); text-align:center; line-height:1.2;
+    animation:glitchFlicker 4s infinite;
+    text-shadow:0 0 20px rgba(255,47,126,0.35);
   }
-  .mono::before{
-    content:""; position:absolute; inset:-8px; border-radius:50%;
-    border:1px solid transparent;
-    border-top-color:var(--rose); border-right-color:var(--violet);
-    animation:ringspin 1.3s linear infinite;
+  .logo-bracket{ color:var(--gold); text-shadow:0 0 12px rgba(240,198,116,0.5); font-style:normal; }
+  .logo-sub{
+    font-family:'Space Mono', monospace;
+    font-size:clamp(0.46rem, 2vw, 0.58rem);
+    letter-spacing:.18em; color:var(--dim);
+    text-align:center; margin-top:6px;
   }
-  @keyframes ringspin{ to{ transform:rotate(360deg); } }
-  .loader-label{
-    font-family:'Space Mono', monospace; font-size:10px; letter-spacing:4px;
-    color:var(--dim); text-transform:uppercase;
+  @keyframes glitchFlicker{
+    0%,96%,100%{ opacity:1; transform:none; }
+    97%{ opacity:.6; transform:translateX(2px) skewX(1deg); }
+    98%{ opacity:1; transform:translateX(-2px) skewX(-1deg); }
+    99%{ opacity:.8; transform:none; }
   }
-  .loader-track{ width:120px; height:1px; background:rgba(255,255,255,0.08); overflow:hidden; }
-  .loader-track i{
-    display:block; height:100%; width:0%;
-    background:linear-gradient(90deg, var(--rose), var(--gold));
-    animation:fillbar 1.5s cubic-bezier(.4,0,.2,1) forwards;
+  .loading-bar-wrap{ width:100%; height:2px; background:var(--line); border-radius:2px; overflow:hidden; }
+  .loading-bar{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--rose), var(--gold), var(--violet));
+    border-radius:2px; transition:width 0.12s linear;
+    box-shadow:0 0 10px rgba(255,47,126,0.4); position:relative;
   }
-  @keyframes fillbar{ to{ width:100%; } }
+  .loading-bar::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.4) 50%, transparent 100%);
+    animation:barShimmer 1.2s linear infinite;
+  }
+  @keyframes barShimmer{ 0%{ transform:translateX(-100%); } 100%{ transform:translateX(300%); } }
+  .loading-meta{ width:100%; display:flex; align-items:center; justify-content:space-between; }
+  .loading-status{
+    font-family:'Space Mono', monospace;
+    font-size:clamp(0.52rem, 2.2vw, 0.62rem);
+    color:var(--dim); letter-spacing:.1em;
+    animation:blinkL 1.1s step-end infinite;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  @keyframes blinkL{ 0%,100%{ opacity:1; } 50%{ opacity:0; } }
+  .loading-pct{
+    font-family:'Space Mono', monospace; font-size:.7rem; color:var(--gold);
+    text-shadow:0 0 8px rgba(240,198,116,0.5); flex-shrink:0;
+  }
+  .boot-lines{
+    width:100%; display:flex; flex-direction:column; gap:3px;
+    font-family:'Space Mono', monospace; font-size:0.52rem;
+    color:var(--dim); letter-spacing:.06em; opacity:.7; min-height:32px;
+  }
+  .boot-line{ animation:fadeUpBoot .3s ease both; }
+  .boot-line.ok{ color:#aaff45; }
+  .boot-line.warn{ color:#ffcc00; }
+  @keyframes fadeUpBoot{ from{ opacity:0; transform:translateY(4px); } to{ opacity:.7; transform:none; } }
 
   /* ===== CARD ===== */
   .card{
@@ -272,10 +331,33 @@
 </head>
 <body>
 
-<div id="loader">
-  <div class="mono">R</div>
-  <div class="loader-label">Loading Profile</div>
-  <div class="loader-track"><i></i></div>
+<div id="loadingScreen">
+  <div class="loading-inner">
+    <div class="load-icon-ring">
+      <div class="load-ring-1"></div>
+      <div class="load-ring-2"></div>
+      <div class="load-ring-3"></div>
+      <div class="load-avatar-icon">
+        <img src="https://anjanapi.zone.id/file/ff3396b570.jpeg" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="">
+      </div>
+    </div>
+    <div>
+      <div class="loading-logo">
+        <span class="logo-bracket">✿</span>&nbsp;𝚁𝚄𝚂𝙷 𝙼𝙰𝚂𝚃𝙴𝚁&nbsp;<span class="logo-bracket">✿</span>
+      </div>
+      <div class="logo-sub">VERIFIED PROFILE &nbsp;·&nbsp; CREATOR ID CARD</div>
+    </div>
+    <div style="width:100%">
+      <div class="loading-bar-wrap">
+        <div class="loading-bar" id="loadingBar"></div>
+      </div>
+    </div>
+    <div class="loading-meta">
+      <p class="loading-status" id="loadingStatus">INITIALIZING SYSTEM...</p>
+      <span class="loading-pct" id="loadingPct">0%</span>
+    </div>
+    <div class="boot-lines" id="bootLines"></div>
+  </div>
 </div>
 
 <div class="bg"></div>
@@ -301,8 +383,8 @@
       <span style="--i:4">&nbsp;</span>
       <span style="--i:5">M</span><span style="--i:6">A</span><span style="--i:7">S</span><span style="--i:8">T</span><span style="--i:9">E</span><span style="--i:10">R</span><span style="--i:11">&nbsp;⚡</span>
     </h1>
-    <div class="role">Creator</div>
-    <div class="loc">📍 <b>Nagpur</b>, Maharashtra, India</div>
+    <div class="role"></div>
+    <div class="loc">⏳ <b>𝙽𝙰𝙶𝙿𝚄𝚁</b>,𝙼𝙰𝙷𝙰𝚁𝙰𝚂𝙷𝚃𝚁𝙰,𝙸𝙽𝙳𝙸𝙰</div>
 
     <div class="rows">
       <a class="row row-whatsapp" href="https://wa.me/+917020728211?text=__%F0%9D%91%AF%E2%98%85%E2%82%92%CE%96%F0%9D%9A%A8%F0%9D%9A%B4_%E2%98%AF%EF%B8%8F_%F0%9D%97%AA%F0%9D%97%9B%F0%9D%97%94%F0%9D%97%9B%27%F0%9D%97%A6_%F0%9D%97%A8%F0%9D%97%A3_%F0%9D%97%A1%F0%9D%97%A5%F0%9D%97%A2%F0%9D%9F%B0_%F0%9F%99%8F%F0%9F%8F%BB" target="_blank" rel="noopener">
@@ -310,8 +392,9 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.43 1.32 4.93L2 22l5.31-1.4a9.9 9.9 0 0 0 4.73 1.2h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.06h-.01a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.07.81.82-3-.2-.31a8.13 8.13 0 1 1 6.89 3.81zm4.45-6.1c-.24-.12-1.45-.72-1.67-.8-.22-.08-.39-.12-.55.12-.16.24-.63.8-.78.96-.14.16-.29.18-.53.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.01-.37.11-.49.11-.11.24-.29.36-.43.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.42h-.47c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.45-.59 1.65-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
         </div>
         <div class="row-body">
-          <div class="row-name">WhatsApp</div>
+          <div class="row-name">𝐖𝐇𝐀𝐓𝐒𝐀𝐏𝐏</div>
           <div class="row-sub"></div>
+          <div class="badge">✓</div>
         </div>
         <div class="row-arrow">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
@@ -323,7 +406,7 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c2.72 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.21.6 1.76 1.15.5.5.9 1.1 1.15 1.76.25.64.42 1.37.47 2.43.05 1.06.06 1.4.06 4.12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.76 4.9 4.9 0 0 1-1.76 1.15c-.64.25-1.37.42-2.43.47-1.06.05-1.4.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.76-1.15 4.9 4.9 0 0 1-1.15-1.76c-.25-.64-.42-1.37-.47-2.43C2.01 15.06 2 14.72 2 12s.01-3.06.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.21 1.15-1.76A4.9 4.9 0 0 1 5.45.53c.64-.25 1.37-.42 2.43-.47C8.94.01 9.28 0 12 0zm0 5.84A6.16 6.16 0 1 0 12 18.16 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-10.8a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z"/></svg>
         </div>
         <div class="row-body">
-          <div class="row-name">Instagram</div>
+          <div class="row-name">𝐈𝐍𝐒𝐓𝐀𝐆𝐑𝐀𝐌</div>
           <div class="row-sub"></div>
         </div>
         <div class="row-arrow">
@@ -336,8 +419,8 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.66.5 12.03c0 5.1 3.29 9.42 7.86 10.96.58.1.79-.25.79-.56v-2.17c-3.2.7-3.88-1.36-3.88-1.36-.52-1.32-1.28-1.67-1.28-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.75 2.69 1.25 3.34.96.1-.74.4-1.25.73-1.54-2.55-.29-5.23-1.27-5.23-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 5.74 0c2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.37-5.25 5.65.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A10.53 10.53 0 0 0 23.5 12.03C23.5 5.66 18.35.5 12 .5z"/></svg>
         </div>
         <div class="row-body">
-          <div class="row-name">GitHub</div>
-          <div class="row-sub">RUSH-OFFICIAL</div>
+          <div class="row-name">𝐆𝐈𝐓𝐇𝐔𝐁</div>
+          <div class="row-sub"></div>
         </div>
         <div class="row-arrow">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
@@ -346,20 +429,68 @@
     </div>
 
     <div class="status-line">
-      <span class="status-dot"></span> Online &amp; Available
+      <span class="status-dot"></span> 𝙾𝙽𝙻𝙸𝙽𝙴 &amp; 𝙰𝚅𝙰𝙸𝙻𝙰𝙱𝙻𝙴
     </div>
 
   </div>
 </div>
 
 <script>
-  window.addEventListener('load', function () {
-    setTimeout(function () {
-      document.getElementById('loader').classList.add('hide');
-      var card = document.getElementById('card');
-      if (card) card.classList.add('in');
-    }, 600);
-  });
+const LOAD_MSGS = [
+  'INITIALIZING SYSTEM...',
+  'VERIFYING PROFILE...',
+  'CONNECTING TO SERVER...',
+  'BUILDING  CARD...',
+  'PREPARING UI...',
+  'PROFILE READY.',
+];
+const BOOT_LOGS = [
+  { t:18, cls:'ok',   txt:'[OK]  crypto layer → loaded' },
+  { t:33, cls:'ok',   txt:'[OK]  identity vault → ready' },
+  { t:50, cls:'ok',   txt:'[OK]  profile engine → linked' },
+  { t:65, cls:'warn', txt:'[!!]  session store → ephemeral' },
+  { t:82, cls:'ok',   txt:'[OK]  media handler → active' },
+  { t:93, cls:'ok',   txt:'[OK]  shield → ENGAGED' },
+];
+(function runLoading(){
+  const bar=document.getElementById('loadingBar');
+  const status=document.getElementById('loadingStatus');
+  const pctEl=document.getElementById('loadingPct');
+  const bootEl=document.getElementById('bootLines');
+  let pct=0,mIdx=0,logged=new Set();
+  const iv=setInterval(()=>{
+    pct+=Math.random()*13+3;
+    if(pct>100)pct=100;
+    bar.style.width=pct+'%';
+    pctEl.textContent=Math.floor(pct)+'%';
+    const nIdx=Math.min(Math.floor((pct/100)*(LOAD_MSGS.length-1)),LOAD_MSGS.length-1);
+    if(nIdx!==mIdx){mIdx=nIdx;status.textContent=LOAD_MSGS[mIdx];}
+    BOOT_LOGS.forEach(log=>{
+      if(pct>=log.t&&!logged.has(log.t)){
+        logged.add(log.t);
+        const line=document.createElement('div');
+        line.className='boot-line '+log.cls;
+        line.textContent=log.txt;
+        bootEl.appendChild(line);
+        while(bootEl.children.length>3)bootEl.removeChild(bootEl.firstChild);
+      }
+    });
+    if(pct>=100){
+      clearInterval(iv);
+      status.textContent=LOAD_MSGS[LOAD_MSGS.length-1];
+      pctEl.textContent='100%';
+      setTimeout(()=>{
+        const ls=document.getElementById('loadingScreen');
+        ls.classList.add('fade-out');
+        setTimeout(()=>{
+          ls.style.display='none';
+          var card = document.getElementById('card');
+          if (card) card.classList.add('in');
+        },620);
+      },500);
+    }
+  },110);
+})();
 </script>
 
 </body>
